@@ -1,55 +1,42 @@
 package server
 
 import (
+	"OzonTestTask/internal/app/data"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"io"
 	"net/http"
 )
 
 type Server struct {
-	config *Config
 	logger *logrus.Logger
 	router *mux.Router
+	data   data.Data
 }
 
-func NewServer(config *Config) *Server {
-	return &Server{
-		config: config,
-		logger: logrus.New(),
+func NewServer(data data.Data) *Server {
+	s := &Server{
 		router: mux.NewRouter(),
-	}
-}
-
-func (s *Server) Start() error {
-	if err := s.ConfigureLogger(); err != nil {
-		return err
+		logger: logrus.New(),
+		data: data,
 	}
 
 	s.ConfigureRouter()
 
-	s.logger.Info("starting server")
-
-	return http.ListenAndServe(s.config.BindAddr, s.router)
+	return s
 }
 
-func (s *Server) ConfigureLogger() error {
-	level, err := logrus.ParseLevel(s.config.LogLevel)
-	if err != nil {
-		return err
-	}
-
-	s.logger.SetLevel(level)
-
-	return nil
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }
 
 func (s *Server) ConfigureRouter() {
-	s.router.HandleFunc("/origin_url", s.handleOriginUrl())
+	s.router.HandleFunc("/saveUrl", s.handleShortLinkCreate()).Methods("POST")
 }
 
-func (s *Server) handleOriginUrl() http.HandlerFunc {
+func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "origin string")
+
 	}
 }
+
+
