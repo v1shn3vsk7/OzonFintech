@@ -10,11 +10,12 @@ func (r *LinkRepository) Create(m *model.Link) error {
 	if err := m.BeforeInsert(); err != nil {
 		return err
 	}
+	//
+	r.data.db.QueryRow(
+		"INSERT INTO links (origin_link, short_link) VALUES ($1,  $2)",
+		m.OriginUrl, m.ShortUrl)
 
-	return r.data.db.QueryRow(
-		"INSERT INTO ozontesttask (origin_link, short_link) VALUES ($1,  $2) RETURNING id",
-		m.OriginUrl, m.ShortUrl,
-	).Scan(&m)
+	return nil
 }
 
 func (r *LinkRepository) FindByShortLink(link string) (*model.Link, error)  {
@@ -23,9 +24,8 @@ func (r *LinkRepository) FindByShortLink(link string) (*model.Link, error)  {
 	if err := r.data.db.QueryRow(
 		"SELECT id, origin_link, short_link FROM links WHERE short_link = $1",
 		link).Scan(
-			&m.Id,
 			&m.OriginUrl,
-			&m.ShortUrl,
+			&m.ShortUrl, //FIX LATER
 			);
 		 err != nil {
 		return nil, err

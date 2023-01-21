@@ -3,7 +3,6 @@ package model
 import "net/url"
 
 type Link struct {
-	Id        int
 	OriginUrl string `json:"URL"`
 	ShortUrl  string `json:"sURL"`
 }
@@ -20,7 +19,8 @@ func (l *Link) BeforeInsert() error {
 
 // HashLink TODO implement creating of short link
 func hashLink(link string) string {
-	return " "
+
+	return "hui"
 }
 
 func validateUrl(Url string) error {

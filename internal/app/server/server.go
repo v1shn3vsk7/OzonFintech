@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"log"
 	"net/http"
 )
 
@@ -17,7 +16,7 @@ type Server struct {
 }
 
 type request struct {
-	url string `json:"URL"`
+	URL string `json:"URL"`
 }
 
 func NewServer(data data.Data) *Server {
@@ -47,11 +46,8 @@ func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-
-		log.Print("hui")
-		log.Print(rq.url)
 		l := &model.Link{
-			OriginUrl: rq.url,
+			OriginUrl: rq.URL,
 			ShortUrl: "",
 		}
 
@@ -59,7 +55,7 @@ func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
-		s.respond(w, r, http.StatusCreated, l)
+		s.respond(w, r, http.StatusCreated, l.ShortUrl)
 	}
 }
 
