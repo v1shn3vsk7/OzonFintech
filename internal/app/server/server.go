@@ -36,18 +36,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) ConfigureRouter() {
-	s.router.HandleFunc("/saveUrl", s.handleShortLinkCreate()).Methods("POST")
+	s.router.HandleFunc("/save", s.handleShortLinkCreate()).Methods("POST")
+	s.router.HandleFunc("/{shortURL}", s.handleGetOriginURL()).Methods("GET")
 }
 
 func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rq := &request{}
-		if err := json.NewDecoder(r.Body).Decode(rq); err != nil {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 		l := &model.Link{
-			OriginUrl: rq.URL,
+			OriginUrl: req.URL,
 			ShortUrl: "",
 		}
 
@@ -56,6 +57,23 @@ func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, l.ShortUrl)
+	}
+}
+
+func (s *Server) handleGetOriginURL() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		l := &model.Link{
+			OriginUrl: "",
+			ShortUrl: vars["shortURL"],
+		}
+
+		if err := s.data.Link().FindByShortURL(l); err != nil {
+			s.error(w, r, http.StatusNoContent, err)
+		}
+
+		s.respond(w, r, http.StatusFound, l.OriginUrl)
 	}
 }
 

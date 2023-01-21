@@ -29,20 +29,16 @@ func (r *LinkRepository) Create(m *model.Link) error {
 	return nil
 }
 
-func (r *LinkRepository) FindByShortLink(link string) (*model.Link, error)  {
-	m := model.Link{}
-
+func (r *LinkRepository) FindByShortURL(m *model.Link) error {
 	if err := r.data.db.QueryRow(
-		"SELECT id, origin_link, short_link FROM links WHERE short_link = $1",
-		link).Scan(
-			&m.OriginUrl,
-			&m.ShortUrl, //FIX LATER
-			);
+		"SELECT origin_link FROM links WHERE short_link = $1",
+		m.ShortUrl).Scan(
+			&m.OriginUrl);
 		 err != nil {
-		return nil, err
+		return err
 	}
 
-	return &m, nil
+	return nil
 }
 
 
