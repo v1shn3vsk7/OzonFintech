@@ -14,7 +14,7 @@ func (r *LinkRepository) Create(m *model.Link) error {
 	return r.data.db.QueryRow(
 		"INSERT INTO ozontesttask (origin_link, short_link) VALUES ($1,  $2) RETURNING id",
 		m.OriginUrl, m.ShortUrl,
-	).Scan(&m.Id)
+	).Scan(&m)
 }
 
 func (r *LinkRepository) FindByShortLink(link string) (*model.Link, error)  {

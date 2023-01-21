@@ -4,8 +4,8 @@ import "net/url"
 
 type Link struct {
 	Id        int
-	OriginUrl string
-	ShortUrl  string
+	OriginUrl string `json:"URL"`
+	ShortUrl  string `json:"sURL"`
 }
 
 func (l *Link) BeforeInsert() error {
