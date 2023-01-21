@@ -1,8 +1,11 @@
 package model
 
-import "net/url"
+import (
+	"net/url"
+)
 
 type Link struct {
+	Id        int
 	OriginUrl string `json:"URL"`
 	ShortUrl  string `json:"sURL"`
 }
@@ -12,15 +15,15 @@ func (l *Link) BeforeInsert() error {
 		return err
 	}
 
-	l.ShortUrl = hashLink(l.OriginUrl)
+	l.ShortUrl = hashLink(l.Id)
 
 	return nil
 }
 
 // HashLink TODO implement creating of short link
-func hashLink(link string) string {
+func hashLink(id int) string {
 
-	return "hui"
+	return "test_hash"
 }
 
 func validateUrl(Url string) error {
