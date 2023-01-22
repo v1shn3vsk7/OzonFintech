@@ -7,7 +7,7 @@ import (
 )
 
 type Data struct {
-	db     		   *sql.DB
+	db             *sql.DB
 	linkRepository *LinkRepository
 }
 
@@ -23,7 +23,7 @@ func (d *Data) Link() data.LinkRepository {
 	}
 
 	d.linkRepository = &LinkRepository{
-		data: *d, ///////////////////////////TODO Fix delete '*'
+		data: *d,
 	}
 
 	return d.linkRepository
