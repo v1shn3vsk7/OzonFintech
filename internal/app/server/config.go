@@ -10,8 +10,6 @@ func NewConfig() *Config {
 	return &Config{
 		BindAddr: ":8080",
 		LogLevel: "debug",
-		DbUrl:    "",
+		DbUrl:    "postgres://user:password@db:5432/ozontesttask?sslmode=disable",
 	}
 }
-
-

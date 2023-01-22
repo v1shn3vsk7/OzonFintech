@@ -6,17 +6,19 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"os"
 )
 
-func Start(cfg *Config, dataType string) error {
-	if dataType == "inmemory" {
+func Start(cfg *Config) error {
+	storeType := os.Getenv("STORE_TYPE")
+	if storeType == "inmemory" {
 		data := &inmemory.Data{}
 
 		s := NewServer(data)
 
 		return http.ListenAndServe(cfg.BindAddr, s)
 
-	} else if dataType == "postgres" {
+	} else if storeType == "postgres" {
 		db, err := newDb(cfg.DbUrl)
 		if err != nil {
 			return err
@@ -29,7 +31,7 @@ func Start(cfg *Config, dataType string) error {
 
 		return http.ListenAndServe(cfg.BindAddr, s)
 	} else {
-		return errors.New("no choice for data")
+		return errors.New("no choice for storage type")
 	}
 
 }
