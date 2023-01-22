@@ -2,28 +2,27 @@ package main
 
 import (
 	"OzonTestTask/internal/app/server"
-	"flag"
-	"github.com/BurntSushi/toml"
 	"log"
 	"os"
 )
 
-var (
-	configPath string
-)
+//var (
+//	configPath string
+//)
 
-func init() {
-	flag.StringVar(&configPath, "config-path", "/Users/vladimirvasilev/Desktop/Projects/OzonTestTask/configs/server.toml", "path to config file")
-}
+//func init() {
+//	flag.StringVar(&configPath, "config-path", "configs/server.toml", "path to config file")
+//}
 
 func main() {
-	flag.Parse()
+	//flag.Parse()
 
 	cfg := server.NewConfig()
-	_, err := toml.DecodeFile(configPath, cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//_, err := toml.DecodeFile(configPath, cfg)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	cfg.DbUrl = "host=localhost dbname=ozontesttask sslmode=disable"
 
 	arg := os.Args[1:]
 
