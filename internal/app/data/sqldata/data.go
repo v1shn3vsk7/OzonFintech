@@ -23,7 +23,7 @@ func (d *Data) Link() data.LinkRepository {
 	}
 
 	d.linkRepository = &LinkRepository{
-		data: d,
+		data: *d, ///////////////////////////TODO Fix delete '*'
 	}
 
 	return d.linkRepository

@@ -5,13 +5,19 @@ import (
 )
 
 type LinkRepository struct {
-	data *Data
+	data Data
 }
 
-//разобраться с дупликатами
 func (r *LinkRepository) Create(m *model.Link) error {
 	if err := m.ValidateURL(); err != nil {
 		return err
+	}
+
+	if err := r.checkIfUrlExists(m); err == nil {
+		return nil
+	}
+	if m.ShortUrl != "" {
+		return nil
 	}
 
 	if err := r.data.db.QueryRow(
@@ -21,7 +27,6 @@ func (r *LinkRepository) Create(m *model.Link) error {
 	}
 
 	m.ShortUrl = model.HashUrl(m.Id)
-
 	r.data.db.QueryRow(
 		"UPDATE links SET short_link = $1 WHERE origin_link = $2",
 		m.ShortUrl, m.OriginUrl)
@@ -35,6 +40,17 @@ func (r *LinkRepository) FindByShortURL(m *model.Link) error {
 		m.ShortUrl).Scan(
 			&m.OriginUrl);
 		 err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *LinkRepository) checkIfUrlExists(m *model.Link) error {
+	if err := r.data.db.QueryRow(
+		"SELECT short_link FROM links WHERE origin_link = $1",
+		m.OriginUrl).Scan(&m.ShortUrl);
+	err != nil {
 		return err
 	}
 

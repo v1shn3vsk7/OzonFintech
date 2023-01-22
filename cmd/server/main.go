@@ -5,6 +5,7 @@ import (
 	"flag"
 	"github.com/BurntSushi/toml"
 	"log"
+	"os"
 )
 
 var (
@@ -12,7 +13,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&configPath, "config-path", "configs/server.toml", "path to config file")
+	flag.StringVar(&configPath, "config-path", "/Users/vladimirvasilev/Desktop/Projects/OzonTestTask/configs/server.toml", "path to config file")
 }
 
 func main() {
@@ -24,7 +25,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := server.Start(cfg); err != nil {
+	arg := os.Args[1:]
+
+	if err := server.Start(cfg, arg[0]); err != nil {
 		log.Fatal(err)
 	}
 
