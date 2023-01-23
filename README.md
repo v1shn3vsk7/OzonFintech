@@ -32,7 +32,7 @@ localhost:8080/b
 ```
 
 ### gRPC
-`localhost:5536/CreateShortUrl`
+Порт:`5536` URL:`CreateShortUrl`
 ```
 В Message запроса указываем URL:
 {
@@ -47,7 +47,7 @@ localhost:8080/b
 }
 ```
 
-`localhost:5536/GetOriginUrl`
+Порт:`5536` URL:`GetOriginUrl`
 ```
 В Message запроса используем сокращенную ссылку:
 {
