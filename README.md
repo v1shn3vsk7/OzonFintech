@@ -1,9 +1,8 @@
-# Тестовое задание
-
 Для выбора типа хранилища необходимо
 перейти в файл [docker-compose.yml](https://github.com/v1shn3vsk7/URL-shortener/blob/main/docker-compose.yml) и изменить переменную окружения `STORE_TYPE` на `STORE_TYPE=inmemory`, для использования сервером **in-memory** хранилища или на `STORE_TYPE=postgres` для использования БД 
 ## Запуск сервера:
-`docker-compose up --build`
+Из папки проекта:
+`docker-compose up --build` (zsh)
 
 ## Запросы:
 ### HTTP

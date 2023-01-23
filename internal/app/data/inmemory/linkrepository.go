@@ -6,7 +6,7 @@ import (
 )
 
 type LinkRepository struct {
-	Data []Data
+	data []Data
 }
 
 func (r *LinkRepository) Create(m *model.Link) error {
@@ -19,21 +19,21 @@ func (r *LinkRepository) Create(m *model.Link) error {
 	}
 
 	data := Data{
-		Id:        len(r.Data) + 1,
+		Id:        len(r.data) + 1,
 		OriginUrl: m.OriginUrl,
 	}
 	m.ShortUrl = model.HashUrl(data.Id)
 	data.ShortUrl = m.ShortUrl
 
-	r.Data = append(r.Data, data)
+	r.data = append(r.data, data)
 
 	return nil
 }
 
 func (r *LinkRepository) FindByShortURL(m *model.Link) error {
-	for i := 0; i < len(r.Data); i++ {
-		if r.Data[i].ShortUrl == m.ShortUrl {
-			m.OriginUrl = r.Data[i].OriginUrl
+	for i := range r.data {
+		if r.data[i].ShortUrl == m.ShortUrl {
+			m.OriginUrl = r.data[i].OriginUrl
 			return nil
 		}
 	}
@@ -41,9 +41,9 @@ func (r *LinkRepository) FindByShortURL(m *model.Link) error {
 }
 
 func (r *LinkRepository) checkIfUrlExists(m *model.Link) bool {
-	for i := range r.Data {
-		if r.Data[i].OriginUrl == m.OriginUrl {
-			m.ShortUrl = r.Data[i].ShortUrl
+	for i := range r.data {
+		if r.data[i].OriginUrl == m.OriginUrl {
+			m.ShortUrl = r.data[i].ShortUrl
 			return true
 		}
 	}
