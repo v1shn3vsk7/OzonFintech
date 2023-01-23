@@ -8,7 +8,7 @@
 ### HTTP
 `[POST] /createShortUrl`
 ```
-localhost:8080/CreateShortUrl
+localhost:8080/createShortUrl
 ```
 ```
 В теле запроса передаем json, например:
