@@ -2,10 +2,11 @@ version: '3'
 services:
   backend:
     environment:
-      - STORE_TYPE=inmemory
+      - STORE_TYPE=postgres
     build: .
     ports:
       - "8080:8080"
+      - "5536:5536"
     networks:
       - mynetwork
     depends_on:

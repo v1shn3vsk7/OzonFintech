@@ -16,42 +16,39 @@ import (
 	"os"
 )
 
-type gRPCServer struct {
+type GRPCServer struct {
 	data   data.Data
 	server *grpc.Server
 	pb.UnimplementedUrlServer
 }
 
-func NewgRPCServer(data data.Data, server *grpc.Server) *gRPCServer {
-	return &gRPCServer{
+func NewgRPCServer(data data.Data, server *grpc.Server) *GRPCServer {
+	return &GRPCServer{
 		data: data,
 		server: server,
 	}
 }
 
 func Start() error{
-	listener, err := net.Listen("tcp", ":5300")
+	listener, err := net.Listen("tcp", ":5536")
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}
 
-	//opts := []grpc.ServerOption{}
-	//grpcServer := grpc.NewServer(opts...)
 	grpcServer := grpc.NewServer()
 
 	storeType := os.Getenv("STORE_TYPE")
 	if storeType == "inmemory" {
-		data := &inmemory.Data{}
+		d := &inmemory.Data{}
 
-		s := NewgRPCServer(data, grpcServer)
+		s := NewgRPCServer(d, grpcServer)
 
-		pb.RegisterUrlServer(s.server, &gRPCServer{})
+		pb.RegisterUrlServer(s.server, &GRPCServer{data: d})
 
 		if err := s.server.Serve(listener); err != nil {
 			log.Fatal(err)
 		}
 
-		//s.server.Serve(listener)
 	} else if storeType == "postgres" {
 		db, err := newDb("postgres://user:password@db:5432/ozontesttask?sslmode=disable") /////////TODO FIX
 		if err != nil {
@@ -60,11 +57,11 @@ func Start() error{
 
 		defer db.Close()
 
-		data := sqldata.New(db)
+		d := sqldata.New(db)
 
-		s := NewgRPCServer(data, grpcServer)
+		s := NewgRPCServer(d, grpcServer)
 
-		pb.RegisterUrlServer(s.server, &gRPCServer{})
+		pb.RegisterUrlServer(s.server, &GRPCServer{data: d})
 
 		if err := s.server.Serve(listener); err != nil {
 			log.Fatal(err)
@@ -91,11 +88,13 @@ func newDb(dbUrl string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (s *gRPCServer) CreateShortUrl(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+func (s *GRPCServer) CreateShortUrl(ctx context.Context, in *pb.Request) (*pb.Response, error) {
 	link := &model.Link{
 		OriginUrl: in.Url,
 		ShortUrl: "",
 	}
+
+	//panic(s.data)
 
 	if err := s.data.Link().Create(link); err != nil {
 		//s.error(w, r, http.StatusUnprocessableEntity, err)
@@ -108,7 +107,7 @@ func (s *gRPCServer) CreateShortUrl(ctx context.Context, in *pb.Request) (*pb.Re
 	}, nil
 }
 
-func (s *gRPCServer) GetOriginUrl(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+func (s *GRPCServer) GetOriginUrl(ctx context.Context, in *pb.Request) (*pb.Response, error) {
 	link := &model.Link{
 		OriginUrl: "",
 		ShortUrl: in.Url,
