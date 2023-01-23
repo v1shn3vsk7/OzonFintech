@@ -1,6 +1,8 @@
 package inmemory
 
-import "OzonTestTask/internal/app/data"
+import (
+	"OzonTestTask/internal/app/data"
+)
 
 type Data struct {
 	Id             int
@@ -9,13 +11,12 @@ type Data struct {
 	linkRepository *LinkRepository
 }
 
-func (d *Data) Link() data.LinkRepository {
+func (d *Data) Link() data.ILinkRepository {
 	if d.linkRepository != nil {
 		return d.linkRepository
 	}
 
-	d.linkRepository = &LinkRepository{
-	}
+	d.linkRepository = &LinkRepository{}
 
 	return d.linkRepository
 }

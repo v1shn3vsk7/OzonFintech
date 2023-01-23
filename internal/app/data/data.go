@@ -1,5 +1,5 @@
 package data
 
-type Data interface {
-	Link() LinkRepository
+type IData interface {
+	Link() ILinkRepository
 }

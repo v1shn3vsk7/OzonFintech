@@ -1,7 +1,6 @@
 package server
 
 import (
-	"OzonTestTask/internal/app/data/inmemory"
 	"OzonTestTask/internal/app/data/sqldata"
 	"database/sql"
 	"errors"
@@ -12,7 +11,7 @@ import (
 func Start(cfg *Config) error {
 	storeType := os.Getenv("STORE_TYPE")
 	if storeType == "inmemory" {
-		data := &inmemory.Data{}
+		data := cfg.Data
 
 		s := NewServer(data)
 

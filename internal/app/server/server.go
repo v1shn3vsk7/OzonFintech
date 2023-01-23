@@ -5,25 +5,22 @@ import (
 	"OzonTestTask/internal/app/model"
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 type Server struct {
-	logger *logrus.Logger
 	router *mux.Router
-	data   data.Data
+	Data   data.IData
 }
 
 type request struct {
 	URL string `json:"URL"`
 }
 
-func NewServer(data data.Data) *Server {
+func NewServer(data data.IData) *Server {
 	s := &Server{
 		router: mux.NewRouter(),
-		logger: logrus.New(),
-		data: data,
+		Data:   data,
 	}
 
 	s.ConfigureRouter()
@@ -52,7 +49,7 @@ func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 			ShortUrl: "",
 		}
 
-		if err := s.data.Link().Create(link); err != nil {
+		if err := s.Data.Link().Create(link); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
@@ -69,7 +66,7 @@ func (s *Server) handleGetOriginURL() http.HandlerFunc {
 			ShortUrl: vars["shortURL"],
 		}
 
-		if err := s.data.Link().FindByShortURL(link); err != nil {
+		if err := s.Data.Link().FindByShortURL(link); err != nil {
 			s.error(w, r, http.StatusNoContent, err)
 		}
 
@@ -87,6 +84,10 @@ func (s *Server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
+}
+
+func (s *Server) GetServerData() *data.IData {
+	return &s.Data
 }
 
 

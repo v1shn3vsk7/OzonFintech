@@ -2,9 +2,9 @@ package gRPC
 
 import (
 	"OzonTestTask/internal/app/data"
-	"OzonTestTask/internal/app/data/inmemory"
 	"OzonTestTask/internal/app/data/sqldata"
 	"OzonTestTask/internal/app/model"
+	"OzonTestTask/internal/app/server"
 	pb "OzonTestTask/internal/app/server/gRPC/proto"
 	"context"
 	"database/sql"
@@ -15,28 +15,29 @@ import (
 )
 
 type GRPCServer struct {
-	data   data.Data
+	Data   data.IData
 	server *grpc.Server
 	pb.UnimplementedUrlServer
 }
 
-func NewgRPCServer(data data.Data, server *grpc.Server) *GRPCServer {
+func NewgRPCServer(data data.IData, server *grpc.Server) *GRPCServer {
 	return &GRPCServer{
-		data: data,
+		Data: data,
 		server: server,
 	}
 }
 
-func (s *GRPCServer) Serve(d data.Data, lis net.Listener) error {
-	pb.RegisterUrlServer(s.server, &GRPCServer{data: d})
+func (s *GRPCServer) Serve(d data.IData, lis net.Listener) error {
+	pb.RegisterUrlServer(s.server, &GRPCServer{Data: d})
 
 	if err := s.server.Serve(lis); err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func Start() error{
+func Start(cfg *server.Config) error{
 	listener, err := net.Listen("tcp", ":5536")
 	if err != nil {
 		return err
@@ -44,11 +45,11 @@ func Start() error{
 
 	grpcServer := grpc.NewServer()
 
-	var d data.Data
+	var d data.IData
 
 	storeType := os.Getenv("STORE_TYPE")
 	if storeType == "inmemory" {
-		d = &inmemory.Data{}
+		d = cfg.Data
 
 	} else if storeType == "postgres" {
 		db, err := newDb(os.Getenv("DB_URL"))
@@ -90,7 +91,7 @@ func (s *GRPCServer) CreateShortUrl(ctx context.Context, in *pb.Request) (*pb.Re
 		ShortUrl: "",
 	}
 
-	if err := s.data.Link().Create(link); err != nil {
+	if err := s.Data.Link().Create(link); err != nil {
 		return nil, err
 	}
 
@@ -105,7 +106,7 @@ func (s *GRPCServer) GetOriginUrl(ctx context.Context, in *pb.Request) (*pb.Resp
 		ShortUrl: in.Url,
 	}
 
-	if err := s.data.Link().FindByShortURL(link); err != nil {
+	if err := s.Data.Link().FindByShortURL(link); err != nil {
 		return nil, err
 	}
 

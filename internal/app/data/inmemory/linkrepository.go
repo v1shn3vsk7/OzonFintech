@@ -37,7 +37,6 @@ func (r *LinkRepository) FindByShortURL(m *model.Link) error {
 			return nil
 		}
 	}
-
 	return errors.New("URL not found")
 }
 
@@ -48,6 +47,5 @@ func (r *LinkRepository) checkIfUrlExists(m *model.Link) bool {
 			return true
 		}
 	}
-
 	return false
 }

@@ -17,7 +17,7 @@ func New(db *sql.DB) *Data {
 	}
 }
 
-func (d *Data) Link() data.LinkRepository {
+func (d *Data) Link() data.ILinkRepository {
 	if d.linkRepository != nil {
 		return d.linkRepository
 	}
