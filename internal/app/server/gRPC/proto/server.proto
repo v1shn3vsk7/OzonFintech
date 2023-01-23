@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "OzonTestTask/internal/app/server/gRPC/proto/server.proto";
+
+package gRPC;
+
+service Url {
+  rpc CreateShortUrl(Request) returns(Response){}
+  rpc GetOriginUrl(Request) returns(Response) {}
+}
+
+message Request {
+  string Url = 1;
+}
+
+message Response {
+  string message = 1;
+  string error = 2;
+}

@@ -7,7 +7,7 @@ import (
 type Link struct {
 	Id        int
 	OriginUrl string `json:"URL"`
-	ShortUrl  string `json:"sURL"`
+	ShortUrl  string
 }
 
 func HashUrl(id int) string {
