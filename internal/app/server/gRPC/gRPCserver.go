@@ -10,8 +10,6 @@ import (
 	"database/sql"
 	"errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
-	"log"
 	"net"
 	"os"
 )
@@ -29,47 +27,45 @@ func NewgRPCServer(data data.Data, server *grpc.Server) *GRPCServer {
 	}
 }
 
+func (s *GRPCServer) Serve(d data.Data, lis net.Listener) error {
+	pb.RegisterUrlServer(s.server, &GRPCServer{data: d})
+
+	if err := s.server.Serve(lis); err != nil {
+		return err
+	}
+	return nil
+}
+
 func Start() error{
 	listener, err := net.Listen("tcp", ":5536")
 	if err != nil {
-		grpclog.Fatalf("failed to listen: %v", err)
+		return err
 	}
 
 	grpcServer := grpc.NewServer()
 
+	var d data.Data
+
 	storeType := os.Getenv("STORE_TYPE")
 	if storeType == "inmemory" {
-		d := &inmemory.Data{}
-
-		s := NewgRPCServer(d, grpcServer)
-
-		pb.RegisterUrlServer(s.server, &GRPCServer{data: d})
-
-		if err := s.server.Serve(listener); err != nil {
-			log.Fatal(err)
-		}
+		d = &inmemory.Data{}
 
 	} else if storeType == "postgres" {
-		db, err := newDb("postgres://user:password@db:5432/ozontesttask?sslmode=disable") /////////TODO FIX
+		db, err := newDb(os.Getenv("DB_URL"))
 		if err != nil {
 			return err
 		}
-
 		defer db.Close()
 
-		d := sqldata.New(db)
+		d = sqldata.New(db)
 
-		s := NewgRPCServer(d, grpcServer)
-
-		pb.RegisterUrlServer(s.server, &GRPCServer{data: d})
-
-		if err := s.server.Serve(listener); err != nil {
-			log.Fatal(err)
-		}
-
-		//s.server.Serve(listener)
-	} else {
+		} else {
 		return errors.New("no choice for storage type")
+	}
+
+	s := NewgRPCServer(d, grpcServer)
+	if err := s.Serve(d, listener); err != nil {
+		return err
 	}
 
 	return nil
@@ -94,16 +90,12 @@ func (s *GRPCServer) CreateShortUrl(ctx context.Context, in *pb.Request) (*pb.Re
 		ShortUrl: "",
 	}
 
-	//panic(s.data)
-
 	if err := s.data.Link().Create(link); err != nil {
-		//s.error(w, r, http.StatusUnprocessableEntity, err)
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return &pb.Response{
-		Message: link.ShortUrl,
-		Error:   "",
+		Url: link.ShortUrl,
 	}, nil
 }
 
@@ -114,12 +106,10 @@ func (s *GRPCServer) GetOriginUrl(ctx context.Context, in *pb.Request) (*pb.Resp
 	}
 
 	if err := s.data.Link().FindByShortURL(link); err != nil {
-		//s.error(w, r, http.StatusNoContent, err)
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return &pb.Response{
-		Message: link.OriginUrl,
-		Error:   "",
+		Url: link.OriginUrl,
 	}, nil
 }

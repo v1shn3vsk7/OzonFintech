@@ -52,8 +52,6 @@ func (s *Server) handleShortLinkCreate() http.HandlerFunc {
 			ShortUrl: "",
 		}
 
-		//panic (s.data)
-
 		if err := s.data.Link().Create(link); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}

@@ -3,6 +3,7 @@ services:
   backend:
     environment:
       - STORE_TYPE=postgres
+      - DB_URL=postgres://user:password@db:5432/ozontesttask?sslmode=disable
     build: .
     ports:
       - "8080:8080"

@@ -6,15 +6,16 @@
 `docker-compose up --build`
 
 ## Запросы:
+### HTTP
 `[POST] /createShortUrl`
 ```
 localhost:8080/CreateShortUrl
 ```
 ```
 В теле запроса передаем json, например:
-`{
+{
     "URL": "https://google.com"
-}`
+}
 
 Получаем ответ:
 ["b"]
@@ -25,9 +26,41 @@ localhost:8080/CreateShortUrl
 localhost:8080/b
 ```
 
+
 ```
 Ответ:
 ["https://google.com"]
+```
+
+### gRPC
+`localhost:5536/CreateShortUrl`
+```
+В Message запроса указываем URL:
+{
+    "Url": "https://github.com"
+}
+```
+
+```
+Ответ:
+{
+    "Url": "c"
+}
+```
+
+`localhost:5536/GetOriginUrl`
+```
+В Message запроса используем сокращенную ссылку:
+{
+    "Url": "c"
+}
+```
+
+```
+Ответ:
+{
+    "Url": "https://github.com"
+}
 ```
 
 ## Реализация алгоритма сокращения ссылки
