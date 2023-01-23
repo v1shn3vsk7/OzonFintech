@@ -5,4 +5,4 @@
 *.dylib
 *.test
 *.out
-*.idea
+.idea
